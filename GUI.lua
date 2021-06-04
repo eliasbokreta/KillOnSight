@@ -26,7 +26,7 @@ function KillOnSight:InitGUI()
     local button = AceGUI:Create("Button")
     button:SetText("Delete All")
     button:SetWidth(100)
-    button:SetCallback("OnClick", function() KillOnSight:Purge() end)
+    button:SetCallback("OnClick", function() KillOnSight:PurgeData() end)
     frame:AddChild(button)
 
     local playerList = AceGUI:Create("SimpleGroup")
@@ -157,6 +157,16 @@ function KillOnSight:RefreshKosList()
         dateColumn:AddChild(dateValue)
 
     end
+end
+
+function KillOnSight:EnemyFoundCreateFrame(enemyName)
+    local enemyFoundFrame = CreateFrame("MessageFrame", UIParent)
+    enemyFoundFrame:SetPoint("TOP")
+    enemyFoundFrame:SetSize(300, 60)
+    enemyFoundFrame:SetTimeVisible(0.8)
+    enemyFoundFrame:SetFadeDuration(0.4)
+    enemyFoundFrame:SetFont("Fonts\\FRIZQT__.TTF", 30)
+    enemyFoundFrame:AddMessage("KILL ON SIGHT !\n" .. enemyName, 1.0, 0.0, 0.0, 53)
 end
 
 function KillOnSight:HideGUI()
