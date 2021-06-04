@@ -7,6 +7,9 @@
 ## X-Embeds: Ace3
 ## SavedVariables: kosDB
 
+Locales\enUS.lua
+Locales\frFR.lua
+
 embeds.xml
 KillOnSight.lua
 GUI.lua
