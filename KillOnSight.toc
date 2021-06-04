@@ -5,6 +5,7 @@
 ## Version: 0.1
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
+## SavedVariables: kosDB
 
 embeds.xml
 KillOnSight.lua
