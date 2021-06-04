@@ -1,14 +1,15 @@
 local addonName = "KillOnSight"
 KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 
-function KillOnSight:OnInitialize()
-    local defaults = {
-        profile = {
-            players = {},
-        }
+local defaultProfile = {
+    profile = {
+        players = {},
     }
+}
+
+function KillOnSight:OnInitialize()
     local globalProfile = true
-    self.db = LibStub("AceDB-3.0"):New(addonName, defaults, globalProfile)
+    self.db = LibStub("AceDB-3.0"):New("kosDB", defaults, globalProfile)
     KillOnSight:InitGUI()
 end
 
@@ -75,6 +76,6 @@ function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
 end
 
 function KillOnSight:PurgeData()
-    self.db.profile.players = {}
+    self.db.profile.players = defaultProfile.profile.players
     KillOnSight:RefreshKosList()
 end
