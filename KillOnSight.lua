@@ -12,6 +12,21 @@ function KillOnSight:OnInitialize()
     KillOnSight:InitGUI()
 end
 
+function KillOnSight:OnEnable()
+    KillOnSight:RegisterEvent("PLAYER_TARGET_CHANGED")
+end
+
+function KillOnSight:PLAYER_TARGET_CHANGED()
+    KillOnSight:Print("TARGET CHANGED")
+    for i,v in ipairs(self.db.profile.players) do
+        if UnitName("target") == v.name then
+            KillOnSight:Print("Found " .. v.name .. " ! He is on your KoS")
+            PlaySound(8959)
+            KillOnSight:EnemyFoundCreateFrame(v.name)
+        end
+    end
+end
+
 function KillOnSight:AddEnemy()
     local playerFaction = UnitFactionGroup("player")
     local zoneName = GetZoneText()
@@ -37,9 +52,8 @@ function KillOnSight:AddEnemy()
 end
 
 function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
-    local count = #self.db.profile.players
     local enemy = {
-        ['id'] = count,
+        ['id'] = #self.db.profile.players,
         ['name'] = targetName,
         ['level'] = targetLevel,
         ['class'] = targetClass,
@@ -58,4 +72,9 @@ function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
     else
         KillOnSight:Print("Your target is already on your KoS list !")
     end
+end
+
+function KillOnSight:PurgeData()
+    self.db.profile.players = {}
+    KillOnSight:RefreshKosList()
 end
