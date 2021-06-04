@@ -1,0 +1,12 @@
+## Interface: 20501
+## Title: KillOnSight
+## Notes: Basic kill on sight addon, allows you to save an enemy player into a KoS list
+## Author: eliasbokreta
+## Version: 0.1
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+KillOnSight.lua
+GUI.lua
+Options.lua
