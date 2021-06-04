@@ -23,9 +23,18 @@ end
 
 function KillOnSight:OnEnable()
     KillOnSight:RegisterEvent("PLAYER_TARGET_CHANGED")
+    KillOnSight:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 end
 
 function KillOnSight:PLAYER_TARGET_CHANGED()
+    KillOnSight:AlertEvent()
+end
+
+function KillOnSight:UPDATE_MOUSEOVER_UNIT()
+    KillOnSight:AlertEvent()
+end
+
+function KillOnSight:AlertEvent()
     local currentZone = GetRealZoneText()
     
     if self.db.profile.settings.enableInBG == false then
@@ -41,7 +50,7 @@ function KillOnSight:PLAYER_TARGET_CHANGED()
     end
 
     for i,v in ipairs(self.db.profile.players) do
-        if UnitName("target") == v.name then
+        if UnitName("target") == v.name or UnitName("mouseover") == v.name then
             if self.db.profile.settings.enableAlertSound then
                 PlaySound(8959)
             end
@@ -78,7 +87,6 @@ end
 
 function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
     local enemy = {
-        ['id'] = #self.db.profile.players,
         ['name'] = targetName,
         ['level'] = targetLevel,
         ['class'] = targetClass,
@@ -102,4 +110,15 @@ end
 function KillOnSight:PurgeData()
     self.db.profile.players = {players = {}}
     KillOnSight:ResetGUI()
+end
+
+function KillOnSight:SetExportString(string)
+    string = KillOnSight:FromBase64(string)
+    self.db.profile.players = KillOnSight:stringToTable(string)
+    KillOnSight:RefreshKosList()
+    KillOnSight:ResetGUI()
+end
+
+function KillOnSight:GetExportString()
+    return KillOnSight:ToBase64(KillOnSight:tableToString(self.db.profile.players))
 end
