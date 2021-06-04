@@ -71,9 +71,9 @@ function KillOnSight:RegisterOptionsTable()
                     },
                     delete = {
                         type = 'execute',
-                        name = 'Reset DB',
+                        name = 'Reset Database',
                         desc = 'Delete Database',
-                        func = 'InitGUI',
+                        func = 'PurgeData',
                     }
                 }
             }
