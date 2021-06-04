@@ -69,6 +69,17 @@ function KillOnSight:RegisterOptionsTable()
                         get = function() return self.db.profile.settings.enableAlertText end,
                         set = function(_, val) self.db.profile.settings.enableAlertText = val end,
                     },
+                    exportImportData = {
+                        type = 'input',
+                        name = 'Export/Import Data',
+                        desc = 'Export or import KoS list',
+                        get = function()
+                                return KillOnSight:GetExportString()
+                            end,
+                        set = function(_, val)
+                                KillOnSight:SetExportString(val)
+                            end,
+                    },
                     delete = {
                         type = 'execute',
                         name = 'Reset Database',
