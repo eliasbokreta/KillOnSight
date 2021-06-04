@@ -1,7 +1,7 @@
 # KillOnSight [In Progress]
 
 ## What is it ?
-This is a World Of Warcraft addon which allows to create and save a Kill On Sight list of targeted enemy players.
+This is a World Of Warcraft addon which allows to create a Kill On Sight list of targeted enemy players and alert you whenever you target them.
 
 ## Requirements
 KillOnSight is currently developed using **Classic Burning Cruisade** interface (version 20501).
