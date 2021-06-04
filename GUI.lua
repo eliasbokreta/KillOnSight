@@ -17,6 +17,11 @@ function KillOnSight:InitGUI()
     frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
     frame:SetLayout("List")
 
+    KillOnSight:InitFrame()
+    KillOnSight:RefreshKosList()
+end
+
+function KillOnSight:InitFrame()
     local button = AceGUI:Create("Button")
     button:SetText("Add Target")
     button:SetWidth(100)
@@ -44,7 +49,8 @@ function KillOnSight:InitGUI()
     scroll:AddChild(playerNameColumn)
     
     local playerNameLabel = AceGUI:Create("Label")
-    playerNameLabel:SetText("Name")
+    playerNameLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    playerNameLabel:SetText("Name\n\n")
     playerNameLabel:SetFullWidth(true)
     playerNameLabel:SetJustifyH("CENTER")
     playerNameColumn:AddChild(playerNameLabel)
@@ -54,7 +60,8 @@ function KillOnSight:InitGUI()
     scroll:AddChild(playerLevelColumn)
     
     local playerLevelLabel = AceGUI:Create("Label")
-    playerLevelLabel:SetText("Level")
+    playerLevelLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    playerLevelLabel:SetText("Level\n\n")
     playerLevelLabel:SetFullWidth(true)
     playerLevelLabel:SetJustifyH("CENTER")
     playerLevelColumn:AddChild(playerLevelLabel)
@@ -64,7 +71,8 @@ function KillOnSight:InitGUI()
     scroll:AddChild(playerClassColumn)
     
     local playerClassLabel = AceGUI:Create("Label")
-    playerClassLabel:SetText("Class")
+    playerClassLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    playerClassLabel:SetText("Class\n\n")
     playerClassLabel:SetFullWidth(true)
     playerClassLabel:SetJustifyH("CENTER")
     playerClassColumn:AddChild(playerClassLabel)
@@ -74,7 +82,8 @@ function KillOnSight:InitGUI()
     scroll:AddChild(zoneColumn)
     
     local zoneLabel = AceGUI:Create("Label")
-    zoneLabel:SetText("Zone")
+    zoneLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    zoneLabel:SetText("Zone\n\n")
     zoneLabel:SetFullWidth(true)
     zoneLabel:SetJustifyH("CENTER")
     zoneColumn:AddChild(zoneLabel)
@@ -84,12 +93,11 @@ function KillOnSight:InitGUI()
     scroll:AddChild(dateColumn)
     
     local dateLabel = AceGUI:Create("Label")
-    dateLabel:SetText("Date")
+    dateLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    dateLabel:SetText("Date\n\n")
     dateLabel:SetFullWidth(true)
     dateLabel:SetJustifyH("CENTER")
     dateColumn:AddChild(dateLabel)
-
-    KillOnSight:RefreshKosList()
 end
 
 function KillOnSight:AddToKosList(enemy)
@@ -169,6 +177,16 @@ function KillOnSight:EnemyFoundCreateFrame(enemyName)
     enemyFoundFrame:AddMessage("KILL ON SIGHT !\n" .. enemyName, 1.0, 0.0, 0.0, 53)
 end
 
+function KillOnSight:ResetGUI()
+    frame:ReleaseChildren()
+    KillOnSight:InitFrame()
+    KillOnSight:RefreshKosList()
+end
+
 function KillOnSight:HideGUI()
     frame:Hide()
+end
+
+function KillOnSight:ShowGUI()
+    frame:Show()
 end
