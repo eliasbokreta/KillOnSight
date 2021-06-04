@@ -1,15 +1,23 @@
 local addonName = "KillOnSight"
 KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 
 local defaultProfile = {
     profile = {
         players = {},
+        settings = {
+            enableInBG = false,
+            enableInArena = false,
+            enableAlertSound = true,
+            enableAlertText = true,
+        }
     }
 }
 
 function KillOnSight:OnInitialize()
     local globalProfile = true
-    self.db = LibStub("AceDB-3.0"):New("kosDB", defaults, globalProfile)
+    self.db = LibStub("AceDB-3.0"):New("kosDB", defaultProfile, globalProfile)
+    KillOnSight:RegisterOptionsTable()
     KillOnSight:InitGUI()
 end
 
@@ -18,19 +26,35 @@ function KillOnSight:OnEnable()
 end
 
 function KillOnSight:PLAYER_TARGET_CHANGED()
-    KillOnSight:Print("TARGET CHANGED")
+    local currentZone = GetRealZoneText()
+    
+    if self.db.profile.settings.enableInBG == false then
+        if currentZone == L["Warsong Gulch"] or currentZone == L["Arathi Basin"] or currentZone == L["Alterac Valley"] or currentZone == L["Eye of the Storm"] then
+            return
+        end
+    end
+
+    if self.db.profile.settings.enableInArena == false then
+        if currentZone == L["Nagrand Arena"] or currentZone == L["Ruins of Lordaeron"] or currentZone == L["Dalaran Arena"] or currentZone == L["The Ring of Valor"] then
+            return
+        end
+    end
+
     for i,v in ipairs(self.db.profile.players) do
         if UnitName("target") == v.name then
-            KillOnSight:Print("Found " .. v.name .. " ! He is on your KoS")
-            PlaySound(8959)
-            KillOnSight:EnemyFoundCreateFrame(v.name)
+            if self.db.profile.settings.enableAlertSound then
+                PlaySound(8959)
+            end
+            if self.db.profile.settings.enableAlertText then
+                KillOnSight:EnemyFoundCreateFrame(v.name)
+            end
         end
     end
 end
 
 function KillOnSight:AddEnemy()
     local playerFaction = UnitFactionGroup("player")
-    local zoneName = GetZoneText()
+    local zoneName = GetRealZoneText()
     local targetName = UnitName("target")
 
     if targetName then
@@ -76,6 +100,6 @@ function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
 end
 
 function KillOnSight:PurgeData()
-    self.db.profile.players = defaultProfile.profile.players
-    KillOnSight:RefreshKosList()
+    self.db.profile.players = {players = {}}
+    KillOnSight:ResetGUI()
 end
