@@ -25,6 +25,10 @@ You can access the command line with the following chat slash commands
 - `/kos menu` : Display/hide KoS main menu
 - `/kos settings` : Open interface addon settings
 
+## Screenshots
+![](.github/kosaddon.png)
+
+
 ## To do
 - Implement a single player deletion for the KoS list
 - Implement kills/dead stats for the KoS list
