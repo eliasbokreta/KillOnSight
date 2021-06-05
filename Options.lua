@@ -92,3 +92,13 @@ function KillOnSight:OpenAddonMenu()
     InterfaceOptionsFrame_Show()
     InterfaceOptionsFrame_OpenToCategory(addonName)
 end
+
+function KillOnSight:SetExportString(string)
+    string = KillOnSight:FromBase64(string)
+    self.db.profile.players = KillOnSight:stringToTable(string)
+    KillOnSight:RefreshKosList()
+end
+
+function KillOnSight:GetExportString()
+    return KillOnSight:ToBase64(KillOnSight:tableToString(self.db.profile.players))
+end
