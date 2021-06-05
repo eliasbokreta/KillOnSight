@@ -2,11 +2,12 @@ local addonName = "KillOnSight"
 local KillOnSight = LibStub("AceAddon-3.0"):GetAddon(addonName)
 
 local AceGUI = LibStub("AceGUI-3.0")
+local LibST = LibStub("ScrollingTable")
 
-local winWidth = 650
-local winHeight = 300
+local winWidth = 750
+local winHeight = 450
 
-local frame, playerNameColumn, playerLevelColumn, playerClassColumn, zoneColumn, dateColumn, deleteColumn
+local frame, tabGroup, alertFrame, scrollingTableFrame
 
 function KillOnSight:InitGUI()
     frame = AceGUI:Create("Frame")
@@ -14,179 +15,115 @@ function KillOnSight:InitGUI()
     frame:SetStatusText("KoS list")
     frame:SetWidth(winWidth)
     frame:SetHeight(winHeight)
-    frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
-    frame:SetLayout("List")
+    frame:EnableResize(false)
+    frame:SetCallback("OnClose", ToggleGUI)
+    frame:SetLayout("Fill")
 
-    KillOnSight:InitFrame()
-    KillOnSight:RefreshKosList()
+    tabGroup = AceGUI:Create("TabGroup")
+    tabGroup:SetLayout("Flow")
+    tabGroup:SetTabs({{text="KoS List", value="1"}, {text="K/D Stats", value="2"}})
+    tabGroup:SetCallback("OnGroupSelected", SelectGroup)
+    frame:AddChild(tabGroup)
+
+    tabGroup:SelectTab("1")
+    KillOnSight:InitAlertFrame()
 end
 
-function KillOnSight:InitFrame()
+function KillOnSight:InitKillOnSightListTab()
+    local buttonGroup = AceGUI:Create("SimpleGroup")
+    buttonGroup:SetLayout("Flow")
+    buttonGroup:SetFullWidth(true)
+    tabGroup:AddChild(buttonGroup)
+
     local button = AceGUI:Create("Button")
     button:SetText("Add Target")
     button:SetWidth(100)
     button:SetCallback("OnClick", function() KillOnSight:AddEnemy() end)
-    frame:AddChild(button)
+    buttonGroup:AddChild(button)
 
     local button = AceGUI:Create("Button")
     button:SetText("Delete All")
     button:SetWidth(100)
     button:SetCallback("OnClick", function() KillOnSight:PurgeData() end)
-    frame:AddChild(button)
+    buttonGroup:AddChild(button)
 
-    local playerList = AceGUI:Create("SimpleGroup")
-    playerList:SetFullWidth(true)
-    playerList:SetFullHeight(true)
-    playerList:SetLayout("Fill")
-    frame:AddChild(playerList)
-
-    local scroll = AceGUI:Create("ScrollFrame")
-    scroll:SetLayout("Flow")
-    playerList:AddChild(scroll)
-
-    playerNameColumn = AceGUI:Create("SimpleGroup")
-    playerNameColumn:SetRelativeWidth(0.2)
-    scroll:AddChild(playerNameColumn)
-    
-    local playerNameLabel = AceGUI:Create("Label")
-    playerNameLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
-    playerNameLabel:SetText("Name\n\n")
-    playerNameLabel:SetFullWidth(true)
-    playerNameLabel:SetJustifyH("CENTER")
-    playerNameColumn:AddChild(playerNameLabel)
-
-    playerLevelColumn = AceGUI:Create("SimpleGroup")
-    playerLevelColumn:SetRelativeWidth(0.2)
-    scroll:AddChild(playerLevelColumn)
-    
-    local playerLevelLabel = AceGUI:Create("Label")
-    playerLevelLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
-    playerLevelLabel:SetText("Level\n\n")
-    playerLevelLabel:SetFullWidth(true)
-    playerLevelLabel:SetJustifyH("CENTER")
-    playerLevelColumn:AddChild(playerLevelLabel)
-
-    playerClassColumn = AceGUI:Create("SimpleGroup")
-    playerClassColumn:SetRelativeWidth(0.15)
-    scroll:AddChild(playerClassColumn)
-    
-    local playerClassLabel = AceGUI:Create("Label")
-    playerClassLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
-    playerClassLabel:SetText("Class\n\n")
-    playerClassLabel:SetFullWidth(true)
-    playerClassLabel:SetJustifyH("CENTER")
-    playerClassColumn:AddChild(playerClassLabel)
-
-    zoneColumn = AceGUI:Create("SimpleGroup")
-    zoneColumn:SetRelativeWidth(0.2)
-    scroll:AddChild(zoneColumn)
-    
-    local zoneLabel = AceGUI:Create("Label")
-    zoneLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
-    zoneLabel:SetText("Zone\n\n")
-    zoneLabel:SetFullWidth(true)
-    zoneLabel:SetJustifyH("CENTER")
-    zoneColumn:AddChild(zoneLabel)
-
-    dateColumn = AceGUI:Create("SimpleGroup")
-    dateColumn:SetRelativeWidth(0.2)
-    scroll:AddChild(dateColumn)
-    
-    local dateLabel = AceGUI:Create("Label")
-    dateLabel:SetFont("Fonts\\FRIZQT__.TTF", 15)
-    dateLabel:SetText("Date\n\n")
-    dateLabel:SetFullWidth(true)
-    dateLabel:SetJustifyH("CENTER")
-    dateColumn:AddChild(dateLabel)
+    scrollingTableFrame = LibST:CreateST(KillOnSightListStructure, 15, nil, nil, tabGroup.frame)
+    scrollingTableFrame.frame:ClearAllPoints()
+    scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -130)
+    scrollingTableFrame.head:SetHeight(30)
 end
 
-function KillOnSight:AddToKosList(enemy)
-    local playerName = AceGUI:Create("Label")
-    playerName:SetText(enemy['name'])
-    playerName:SetFullWidth(true)
-    playerName:SetJustifyH("CENTER")
-    playerNameColumn:AddChild(playerName)
-
-    local playerLevel = AceGUI:Create("Label")
-    playerLevel:SetText(enemy['level'])
-    playerLevel:SetFullWidth(true)
-    playerLevel:SetJustifyH("CENTER")
-    playerLevelColumn:AddChild(playerLevel)
-
-    local playerClass = AceGUI:Create("Label")
-    playerClass:SetText(enemy['class'])
-    playerClass:SetFullWidth(true)
-    playerClass:SetJustifyH("CENTER")
-    playerClassColumn:AddChild(playerClass)
-
-    local zone = AceGUI:Create("Label")
-    zone:SetText(enemy['zone'])
-    zone:SetFullWidth(true)
-    zone:SetJustifyH("CENTER")
-    zoneColumn:AddChild(zone)
-
-    local dateValue = AceGUI:Create("Label")
-    dateValue:SetText(enemy['date'])
-    dateValue:SetFullWidth(true)
-    dateValue:SetJustifyH("CENTER")
-    dateColumn:AddChild(dateValue)
+function DrawKillOnSightListTab(container)
+    KillOnSight:InitKillOnSightListTab()
+    KillOnSight:RefreshKosList()
+    scrollingTableFrame:Show()
 end
-
-function KillOnSight:RefreshKosList()
-    for i, value in ipairs(self.db.profile.players) do
-        local playerName = AceGUI:Create("Label")
-        playerName:SetText(value.name)
-        playerName:SetFullWidth(true)
-        playerName:SetJustifyH("CENTER")
-        playerNameColumn:AddChild(playerName)
-
-        local playerLevel = AceGUI:Create("Label")
-        playerLevel:SetText(value.level)
-        playerLevel:SetFullWidth(true)
-        playerLevel:SetJustifyH("CENTER")
-        playerLevelColumn:AddChild(playerLevel)
-
-        local playerClass = AceGUI:Create("Label")
-        playerClass:SetText(value.class)
-        playerClass:SetFullWidth(true)
-        playerClass:SetJustifyH("CENTER")
-        playerClassColumn:AddChild(playerClass)
-
-        local zone = AceGUI:Create("Label")
-        zone:SetText(value.zone)
-        zone:SetFullWidth(true)
-        zone:SetJustifyH("CENTER")
-        zoneColumn:AddChild(zone)
-    
-        local dateValue = AceGUI:Create("Label")
-        dateValue:SetText(value.date)
-        dateValue:SetFullWidth(true)
-        dateValue:SetJustifyH("CENTER")
-        dateColumn:AddChild(dateValue)
-
+  
+function DrawKillDeathStatsTab(container)
+    scrollingTableFrame:Hide()
+end
+  
+function SelectGroup(container, event, group)
+    container:ReleaseChildren()
+    if group == "1" then
+        DrawKillOnSightListTab(container)
+    elseif group == "2" then
+        DrawKillDeathStatsTab(container)
     end
 end
 
+function KillOnSight:InitAlertFrame()
+    alertFrame = CreateFrame("ScrollingMessageFrame", UIParent)
+    alertFrame:SetPoint("TOP")
+    alertFrame:SetSize(300, 50)
+    alertFrame:SetTimeVisible(0.8)
+    alertFrame:SetFadeDuration(0.4)
+    alertFrame:SetFont("Fonts\\FRIZQT__.TTF", 15)
+    alertFrame:SetInsertMode("TOP")
+    alertFrame:SetMaxLines(2)
+end
+
+function KillOnSight:RefreshKosList()
+    local data = {
+        {
+            ["cols"] = {}
+        }
+    }
+    print(#data)
+    for k, v in pairs(self.db.profile.players) do
+        local player = {
+            ["cols"] = {
+                {
+                    ["value"] = v["name"],
+                },
+                {
+                    ["value"] = v["level"],
+                },
+                {
+                    ["value"] = v["class"],
+                },
+                {
+                    ["value"] = v["zone"],
+                },
+                {
+                    ["value"] = v["date"],
+                },
+            }
+        }
+        data[#data+1] = player
+    end
+    table.remove(data, 1)
+    scrollingTableFrame:SetData(data, false)
+end
+
 function KillOnSight:EnemyFoundCreateFrame(enemyName)
-    local enemyFoundFrame = CreateFrame("MessageFrame", UIParent)
-    enemyFoundFrame:SetPoint("TOP")
-    enemyFoundFrame:SetSize(300, 60)
-    enemyFoundFrame:SetTimeVisible(0.8)
-    enemyFoundFrame:SetFadeDuration(0.4)
-    enemyFoundFrame:SetFont("Fonts\\FRIZQT__.TTF", 30)
-    enemyFoundFrame:AddMessage("KILL ON SIGHT !\n" .. enemyName, 1.0, 0.0, 0.0, 53)
+    alertFrame:AddMessage("KILL ON SIGHT : " .. enemyName, 1.0, 0.0, 0.0)
 end
 
-function KillOnSight:ResetGUI()
-    frame:ReleaseChildren()
-    KillOnSight:InitFrame()
-    KillOnSight:RefreshKosList()
-end
-
-function KillOnSight:HideGUI()
-    frame:Hide()
-end
-
-function KillOnSight:ShowGUI()
-    frame:Show()
+function KillOnSight:ToggleGUI()
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
+    end
 end
