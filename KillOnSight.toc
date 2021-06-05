@@ -15,3 +15,4 @@ KillOnSight.lua
 GUI.lua
 Options.lua
 Utils.lua
+KillOnSightStructures.lua
