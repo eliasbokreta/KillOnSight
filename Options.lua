@@ -8,20 +8,6 @@ function KillOnSight:RegisterOptionsTable()
         handler = KillOnSight,
         type = 'group',
         args = {
-            show = {
-                type = 'execute',
-                name = 'showGUI',
-                desc = 'Display KoS menu window',
-                func = 'InitGUI',
-                guiHidden = true
-            },
-            hide = {
-                type = 'execute',
-                name = 'hideGUI',
-                desc = 'Hide KoS menu window',
-                func = 'HideGUI',
-                guiHidden = true
-            },
             add = {
                 type = 'execute',
                 name = 'addTarget',
@@ -31,8 +17,15 @@ function KillOnSight:RegisterOptionsTable()
             },
             menu = {
                 type = 'execute',
+                name = 'toggleGUI',
+                desc = 'Display/hide KoS main menu',
+                func = 'ToggleGUI',
+                guiHidden = true
+            },
+            settings = {
+                type = 'execute',
                 name = 'openAddonMenu',
-                desc = 'Open interface menu',
+                desc = 'Open interface addon settings',
                 func = 'OpenAddonMenu',
                 guiHidden = true
             },
