@@ -62,45 +62,18 @@ end
 
 function KillOnSight:NAME_PLATE_UNIT_ADDED(event, nameplate)
     name = UnitName(nameplate)
-    local currentZone = GetRealZoneText()
-
-    if self.db.profile.settings.enableInArena == false then
-        for arenaUS, arenaLocale in pairs(Arena_List) do
-            if currentZone == arenaLocale then
-                return
-            end
-        end
-    end
-
-    if self.db.profile.settings.enableInBG == false then
-        for bgUS, bgLocale in pairs(BG_List) do
-            if currentZone == bgLocale then
-                return
-            end
-        end
-    end
-
-    for i,v in ipairs(self.db.profile.players) do
-        if name == v.name then
-            if self.db.profile.settings.enableAlertSound then
-                PlaySound(8959)
-            end
-            if self.db.profile.settings.enableAlertText then
-                KillOnSight:EnemyFoundCreateFrame(v.name)
-            end
-        end
-    end
+    KillOnSight:AlertEvent(name)
 end
 
 function KillOnSight:PLAYER_TARGET_CHANGED()
-    KillOnSight:AlertEvent()
+    KillOnSight:AlertEvent(false)
 end
 
 function KillOnSight:UPDATE_MOUSEOVER_UNIT()
-    KillOnSight:AlertEvent()
+    KillOnSight:AlertEvent(false)
 end
 
-function KillOnSight:AlertEvent()
+function KillOnSight:AlertEvent(name)
     local currentZone = GetRealZoneText()
 
     if self.db.profile.settings.enableInArena == false then
@@ -120,7 +93,7 @@ function KillOnSight:AlertEvent()
     end
 
     for i,v in ipairs(self.db.profile.players) do
-        if UnitName("target") == v.name or UnitName("mouseover") == v.name then
+        if UnitName("target") == v.name or UnitName("mouseover") == v.name or name == v.name then
             if self.db.profile.settings.enableAlertSound then
                 PlaySound(8959)
             end
@@ -180,14 +153,4 @@ end
 function KillOnSight:PurgeData()
     self.db.profile.players = {players = {}}
     KillOnSight:RefreshKosList()
-end
-
-function KillOnSight:SetExportString(string)
-    string = KillOnSight:FromBase64(string)
-    self.db.profile.players = KillOnSight:stringToTable(string)
-    KillOnSight:RefreshKosList()
-end
-
-function KillOnSight:GetExportString()
-    return KillOnSight:ToBase64(KillOnSight:tableToString(self.db.profile.players))
 end
