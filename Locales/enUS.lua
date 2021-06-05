@@ -1,13 +1,15 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("KillOnSight", "enUS", true)
 
--- BG ZONES
-L["Warsong Gulch"] = "Warsong Gulch"
-L["Arathi Basin"] = "Arathi Basin"
-L["Alterac Valley"] = "Alterac Valley"
-L["Eye of the Storm"] = "Eye of the Storm"
+BG_List = {
+    ["Warsong Gulch"] = "Warsong Gulch",
+    ["Arathi Basin"] = "Arathi Basin",
+    ["Alterac Valley"] = "Alterac Valley",
+    ["Eye of the Storm"] = "Eye of the Storm",
+}
 
--- ARENA ZONES
-L["Nagrand Arena"] = "Nagrand Arena"
-L["Ruins of Lordaeron"] = "Ruins of Lordaeron"
-L["Dalaran Arena"] = "Dalaran Arena"
-L["The Ring of Valor"] = "The Ring of Valor"
+Arena_List = {
+    ["Nagrand Arena"] = "Nagrand Arena",
+    ["Ruins of Lordaeron"] = "Ruins of Lordaeron",
+    ["Dalaran Arena"] = "Dalaran Arena",
+    ["The Ring of Valor"] = "The Ring of Valor",
+}
