@@ -31,9 +31,10 @@ You can access the command line with the following chat slash commands
 
 ## To do
 - Implement a single player deletion for the KoS list
+- Implement an update on last seen position for KoS list
 - Implement kills/dead stats for the KoS list
 - Separate main window with tabs :
-    - KoS list tab
+    - <s>KoS list tab</s>
     - Kill/dead history tab, with possibility to add a previous enemy to the KoS list
 - Implement a timer for already shown alerts, avoiding alert spaming when changing target/mouseover
 - Implement a silent mode with only chat console messages
