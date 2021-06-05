@@ -22,9 +22,8 @@ You can access the command line with the following chat slash commands
 
 ### Options :
 - `/kos add` : Add current target to KoS
-- `/kos menu` : Open WoW interface's addon window
-- `/kos show` : Open KoS addon main window
-- `/kos hide` : Hide KoS addon main window
+- `/kos menu` : Display/hide KoS main menu
+- `/kos settings` : Open interface addon settings
 
 ## To do
 - Implement a single player deletion for the KoS list
