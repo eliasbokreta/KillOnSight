@@ -1,6 +1,7 @@
 local addonName = "KillOnSight"
 KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local defaultProfile = {
     profile = {
@@ -10,7 +11,16 @@ local defaultProfile = {
             enableInArena = false,
             enableAlertSound = true,
             enableAlertText = true,
-        }
+            [[-- TODO
+            enableAlertOnMouseOver = true,
+            enableAlertOnTarget = true,
+            enableAlertOnNameplateRegistered = true, NEEDED SHOW ENEMY NAMEPLATES
+            enableOnAllies = false, TO DEBUG MOSTLY
+            --]]
+        },
+        minimapButton = {
+            hide = false,
+        },
     }
 }
 
@@ -19,11 +29,67 @@ function KillOnSight:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("kosDB", defaultProfile, globalProfile)
     KillOnSight:RegisterOptionsTable()
     KillOnSight:InitGUI()
+    LDBIcon:Register(addonName, LibStub("LibDataBroker-1.1"):NewDataObject(addonName,
+	{
+		type = "data source",
+		text = addonName,
+        icon = "135271",
+		OnClick = function(self, button)
+			if (button == "LeftButton") then
+                KillOnSight:ToggleGUI()
+            elseif (button == "RightButton") then
+                InterfaceOptionsFrame_Show()
+                InterfaceOptionsFrame_OpenToCategory(addonName)
+            elseif (button == "MiddleButton") then
+                LDBIcon:Hide(addonName)
+            end
+		end,
+		OnTooltipShow = function(tooltip)
+			tooltip:AddLine(addonName)
+			tooltip:AddLine(string.format("|cff888888%s|r |cffffffff%s|r", "Left Click :", "Open KoS main window"))
+            tooltip:AddLine(string.format("|cff888888%s|r |cffffffff%s|r", "Middle Click :", "Hide KoS minimap icon"))
+			tooltip:AddLine(string.format("|cff888888%s|r |cffffffff%s|r", "Right Click :", "Open addon interface window"))
+		end
+    }), self.db.profile.minimapButton)
+    --KillOnSight:HideGUI()
 end
 
 function KillOnSight:OnEnable()
     KillOnSight:RegisterEvent("PLAYER_TARGET_CHANGED")
     KillOnSight:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+    KillOnSight:RegisterEvent("NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_ADDED")
+end
+
+function KillOnSight:NAME_PLATE_UNIT_ADDED(event, nameplate)
+    name = UnitName(nameplate)
+    local currentZone = GetRealZoneText()
+
+    if self.db.profile.settings.enableInArena == false then
+        for arenaUS, arenaLocale in pairs(Arena_List) do
+            if currentZone == arenaLocale then
+                return
+            end
+        end
+    end
+
+    if self.db.profile.settings.enableInBG == false then
+        for bgUS, bgLocale in pairs(BG_List) do
+            if currentZone == bgLocale then
+                return
+            end
+        end
+    end
+
+    for i,v in ipairs(self.db.profile.players) do
+        if name == v.name then
+            if self.db.profile.settings.enableAlertSound then
+                PlaySound(8959)
+            end
+            if self.db.profile.settings.enableAlertText then
+                KillOnSight:EnemyFoundCreateFrame(v.name)
+            end
+        end
+    end
 end
 
 function KillOnSight:PLAYER_TARGET_CHANGED()
@@ -36,16 +102,20 @@ end
 
 function KillOnSight:AlertEvent()
     local currentZone = GetRealZoneText()
-    
-    if self.db.profile.settings.enableInBG == false then
-        if currentZone == L["Warsong Gulch"] or currentZone == L["Arathi Basin"] or currentZone == L["Alterac Valley"] or currentZone == L["Eye of the Storm"] then
-            return
+
+    if self.db.profile.settings.enableInArena == false then
+        for arenaUS, arenaLocale in pairs(Arena_List) do
+            if currentZone == arenaLocale then
+                return
+            end
         end
     end
 
-    if self.db.profile.settings.enableInArena == false then
-        if currentZone == L["Nagrand Arena"] or currentZone == L["Ruins of Lordaeron"] or currentZone == L["Dalaran Arena"] or currentZone == L["The Ring of Valor"] then
-            return
+    if self.db.profile.settings.enableInBG == false then
+        for bgUS, bgLocale in pairs(BG_List) do
+            if currentZone == bgLocale then
+                return
+            end
         end
     end
 
@@ -101,7 +171,7 @@ function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
     end
     if alreadyExists == false then
         table.insert(self.db.profile.players, enemy)
-        KillOnSight:AddToKosList(enemy)
+        KillOnSight:RefreshKosList()
     else
         KillOnSight:Print("Your target is already on your KoS list !")
     end
@@ -109,14 +179,13 @@ end
 
 function KillOnSight:PurgeData()
     self.db.profile.players = {players = {}}
-    KillOnSight:ResetGUI()
+    KillOnSight:RefreshKosList()
 end
 
 function KillOnSight:SetExportString(string)
     string = KillOnSight:FromBase64(string)
     self.db.profile.players = KillOnSight:stringToTable(string)
     KillOnSight:RefreshKosList()
-    KillOnSight:ResetGUI()
 end
 
 function KillOnSight:GetExportString()
