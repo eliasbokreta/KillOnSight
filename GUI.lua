@@ -11,8 +11,7 @@ local frame, tabGroup, alertFrame, scrollingTableFrame
 
 function KillOnSight:InitGUI()
     frame = AceGUI:Create("Frame")
-    frame:SetTitle("KoS")
-    frame:SetStatusText("KoS list")
+    frame:SetTitle("Kill On Sight")
     frame:SetWidth(winWidth)
     frame:SetHeight(winHeight)
     frame:EnableResize(false)
@@ -89,8 +88,7 @@ function KillOnSight:RefreshKosList()
             ["cols"] = {}
         }
     }
-    print(#data)
-    for k, v in pairs(self.db.profile.players) do
+    for k, v in pairs(self.db.char.kos) do
         local player = {
             ["cols"] = {
                 {
@@ -116,7 +114,7 @@ function KillOnSight:RefreshKosList()
     scrollingTableFrame:SetData(data, false)
 end
 
-function KillOnSight:EnemyFoundCreateFrame(enemyName)
+function KillOnSight:EnemyFoundMessage(enemyName)
     alertFrame:AddMessage("KILL ON SIGHT : " .. enemyName, 1.0, 0.0, 0.0)
 end
 
