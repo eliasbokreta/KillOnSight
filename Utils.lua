@@ -1,5 +1,6 @@
 local addonName = "KillOnSight"
 local KillOnSight = LibStub("AceAddon-3.0"):GetAddon(addonName)
+local LibST = LibStub("ScrollingTable")
 
 
 -- Credits to https://gist.github.com/yuhanz/6688d474a3c391daa6d6
@@ -120,4 +121,30 @@ function KillOnSight:FromBase64(to_decode)
         decoded = decoded:sub(1,-2)
     end
     return decoded
+end
+
+function KillOnSight:PrettyPrint(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. KillOnSight:PrettyPrint(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+ end
+
+ function KillOnSight:Sort(obj, rowa, rowb, sortbycol, columnID)
+    local column = obj.cols[sortbycol]
+    local direction = column.sort or column.defaultsort or LibST.SORT_ASC
+    local rowA = tostring(obj.data[rowa]["cols"][columnID]["value"])
+    local rowB = tostring(obj.data[rowb]["cols"][columnID]["value"])
+
+    if direction == LibST.SORT_ASC then
+        return rowA > rowB
+    else
+        return rowA < rowB
+    end
 end
