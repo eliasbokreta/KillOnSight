@@ -95,10 +95,10 @@ end
 
 function KillOnSight:SetExportString(string)
     string = KillOnSight:FromBase64(string)
-    self.db.profile.players = KillOnSight:stringToTable(string)
+    self.db.char.kos = KillOnSight:stringToTable(string)
     KillOnSight:RefreshKosList()
 end
 
 function KillOnSight:GetExportString()
-    return KillOnSight:ToBase64(KillOnSight:tableToString(self.db.profile.players))
+    return KillOnSight:ToBase64(KillOnSight:tableToString(self.db.char.kos))
 end
