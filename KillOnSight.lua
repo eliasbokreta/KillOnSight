@@ -5,7 +5,6 @@ local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local defaultProfile = {
     profile = {
-        players = {},
         settings = {
             enableInBG = false,
             enableInArena = false,
@@ -21,7 +20,10 @@ local defaultProfile = {
         minimapButton = {
             hide = false,
         },
-    }
+    },
+    char = {
+        kos = {},
+    },
 }
 
 function KillOnSight:OnInitialize()
@@ -92,13 +94,13 @@ function KillOnSight:AlertEvent(name)
         end
     end
 
-    for i,v in ipairs(self.db.profile.players) do
+    for i,v in ipairs(self.db.char.kos) do
         if UnitName("target") == v.name or UnitName("mouseover") == v.name or name == v.name then
             if self.db.profile.settings.enableAlertSound then
                 PlaySound(8959)
             end
             if self.db.profile.settings.enableAlertText then
-                KillOnSight:EnemyFoundCreateFrame(v.name)
+                KillOnSight:EnemyFoundMessage(v.name)
             end
         end
     end
@@ -115,16 +117,16 @@ function KillOnSight:AddEnemy()
         local targetLevel = UnitLevel("target")
         local targetClass = UnitClass("target")
 
-        if (UnitIsPlayer("target")) then
+        if (not UnitIsPlayer("target")) then
+            KillOnSight:Print(string.format("|cffff0000%s|r", "This target is not a player !"))
+        else
             if playerFaction ~= targetFaction then
                 -- TODO CALL KOS ADD ENTRY FUNC
             else
-                KillOnSight:Print("Your target is from your faction !")
+                KillOnSight:Print(string.format("|cffff0000%s|r", "This target is from your faction !"))
             end
-        else
-            KillOnSight:Print("Your target is not a player !")
+            KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName) 
         end
-        KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName) 
     end
 end
 
@@ -137,20 +139,21 @@ function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
         ['date'] = date("%m/%d/%y %H:%M"),
     }
     local alreadyExists = false
-    for i,v in ipairs(self.db.profile.players) do
+    for i,v in ipairs(self.db.char.kos) do
         if targetName == v.name then
             alreadyExists = true
         end
     end
     if alreadyExists == false then
-        table.insert(self.db.profile.players, enemy)
+        table.insert(self.db.char.kos, enemy)
         KillOnSight:RefreshKosList()
+        KillOnSight:Print(string.format("%s has been successfully added to your KoS list !", targetName))
     else
-        KillOnSight:Print("Your target is already on your KoS list !")
+        KillOnSight:Print(string.format("|cffff0000%s|r", "This target is already on your KoS list !"))
     end
 end
 
 function KillOnSight:PurgeData()
-    self.db.profile.players = {players = {}}
+    self.db.char.kos = {}
     KillOnSight:RefreshKosList()
 end
