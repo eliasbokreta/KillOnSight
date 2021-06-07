@@ -46,9 +46,20 @@ function KillOnSight:InitKillOnSightListTab()
     button:SetCallback("OnClick", function() KillOnSight:PurgeData() end)
     buttonGroup:AddChild(button)
 
-    scrollingTableFrame = LibST:CreateST(KillOnSightListStructure, 15, nil, nil, tabGroup.frame)
+    local filterName = AceGUI:Create("EditBox")
+    filterName:SetLabel("Filter by name")
+    filterName:SetWidth(100)
+    filterName:DisableButton(true)
+    filterName:SetCallback("OnTextChanged", function(self) KillOnSight:RefreshKosList(filterName:GetText()) end)
+    buttonGroup:AddChild(filterName)
+
+    local heading = AceGUI:Create("Heading")
+    heading:SetRelativeWidth(1)
+    buttonGroup:AddChild(heading)
+
+    scrollingTableFrame = LibST:CreateST(KillOnSightListStructure, 14, nil, nil, tabGroup.frame)
     scrollingTableFrame.frame:ClearAllPoints()
-    scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -130)
+    scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -170)
     scrollingTableFrame.head:SetHeight(30)
 end
 
@@ -82,7 +93,7 @@ function KillOnSight:InitAlertFrame()
     alertFrame:SetMaxLines(2)
 end
 
-function KillOnSight:RefreshKosList()
+function KillOnSight:RefreshKosList(filter)
     local data = {
         cols = {}
     }
@@ -112,7 +123,13 @@ function KillOnSight:RefreshKosList()
                 },]]--
             }
         }
-        data[#data+1] = player
+        if filter ~= nil and filter ~= "" then
+            if string.find(v.name:lower(), filter:lower()) then
+                data[#data+1] = player
+            end
+        else
+            data[#data+1] = player
+        end
     end
     scrollingTableFrame:SetData(data, false)
 end
