@@ -35,11 +35,13 @@ You can access the command line with the following chat slash commands
 - <s>Implement a single player deletion for the KoS list</s>
 - <s>Implement an update on last seen position for KoS list</s>
 - <s>Implement kills/dead stats for the KoS list</s>
-- Separate main window with tabs :
+- <s>Separate main window with tabs :</s>
     - <s>KoS list tab</s>
     - <s>Kill/dead history tab, with possibility to add a previous enemy to the KoS list</s>
 - <s>Implement a timer for already shown alerts, avoiding alert spaming when changing target/mouseover</s>
 - Implement a silent mode with only chat console messages
+- Add guild and realm from KoS and kill/death history tabs
+- Enable possibility to KoS a specific guild for alert whenever a member is found
 
 ## Donate
 ### Paypal :
