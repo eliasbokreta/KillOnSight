@@ -11,6 +11,9 @@ end
 
 function KillOnSight:stringToTable(str)
 	local f = loadstring("return "..str)
+    if f == nil then
+        return nil
+    end
 	return f()
 end
 
