@@ -41,6 +41,12 @@ function KillOnSight:InitKillOnSightListTab()
     buttonGroup:AddChild(button)
 
     local button = AceGUI:Create("Button")
+    button:SetText("Delete Target")
+    button:SetWidth(120)
+    button:SetCallback("OnClick", function() KillOnSight:DeleteEnemy(UnitName("target")) end)
+    buttonGroup:AddChild(button)
+
+    local button = AceGUI:Create("Button")
     button:SetText("Delete All")
     button:SetWidth(100)
     button:SetCallback("OnClick", function() KillOnSight:PurgeData() end)
