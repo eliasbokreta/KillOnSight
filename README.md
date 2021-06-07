@@ -2,6 +2,7 @@
 
 ## What is it ?
 This is a World Of Warcraft addon which allows to create a Kill On Sight list of enemy players and alert you whenever you target or mouseover them, it also scan for currently visible nameplates on your UI and trigger an alert.
+The addon also tracks kills and deaths done to/from a unit.
 
 ## Requirements
 KillOnSight is currently developed using **Classic Burning Cruisade** interface (version 20501). It may works on Retail but it hasn't been tested yet
@@ -33,10 +34,10 @@ You can access the command line with the following chat slash commands
 ## To do
 - <s>Implement a single player deletion for the KoS list</s>
 - <s>Implement an update on last seen position for KoS list</s>
-- Implement kills/dead stats for the KoS list
+- <s>Implement kills/dead stats for the KoS list</s>
 - Separate main window with tabs :
     - <s>KoS list tab</s>
-    - Kill/dead history tab, with possibility to add a previous enemy to the KoS list
+    - <s>Kill/dead history tab, with possibility to add a previous enemy to the KoS list</s>
 - <s>Implement a timer for already shown alerts, avoiding alert spaming when changing target/mouseover</s>
 - Implement a silent mode with only chat console messages
 
