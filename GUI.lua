@@ -7,7 +7,7 @@ local LibST = LibStub("ScrollingTable")
 local winWidth = 750
 local winHeight = 450
 
-local frame, tabGroup, alertFrame, scrollingTableFrame
+local frame, tabGroup, alertFrame, scrollingTableFrame, historyLogsScrollingTableFrame
 
 function KillOnSight:InitGUI()
     frame = AceGUI:Create("Frame")
@@ -20,9 +20,19 @@ function KillOnSight:InitGUI()
 
     tabGroup = AceGUI:Create("TabGroup")
     tabGroup:SetLayout("Flow")
-    tabGroup:SetTabs({{text="KoS List", value="1"}, {text="K/D Stats", value="2"}})
+    tabGroup:SetTabs({{text="KoS List", value="1"}, {text="K/D History", value="2"}})
     tabGroup:SetCallback("OnGroupSelected", SelectGroup)
     frame:AddChild(tabGroup)
+
+    scrollingTableFrame = LibST:CreateST(KillOnSightListStructure, 14, nil, nil, tabGroup.frame)
+    scrollingTableFrame.frame:ClearAllPoints()
+    scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -170)
+    scrollingTableFrame.head:SetHeight(30)
+
+    historyLogsScrollingTableFrame = LibST:CreateST(HistoryLogsStructure, 14, nil, nil, tabGroup.frame)
+    historyLogsScrollingTableFrame.frame:ClearAllPoints()
+    historyLogsScrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -170)
+    historyLogsScrollingTableFrame.head:SetHeight(30)
 
     tabGroup:SelectTab("1")
     KillOnSight:InitAlertFrame()
@@ -62,21 +72,37 @@ function KillOnSight:InitKillOnSightListTab()
     local heading = AceGUI:Create("Heading")
     heading:SetRelativeWidth(1)
     buttonGroup:AddChild(heading)
+end
 
-    scrollingTableFrame = LibST:CreateST(KillOnSightListStructure, 14, nil, nil, tabGroup.frame)
-    scrollingTableFrame.frame:ClearAllPoints()
-    scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -170)
-    scrollingTableFrame.head:SetHeight(30)
+function KillOnSight:InitHistoryLogsTab()
+    local buttonGroup = AceGUI:Create("SimpleGroup")
+    buttonGroup:SetLayout("Flow")
+    buttonGroup:SetFullWidth(true)
+    tabGroup:AddChild(buttonGroup)
+
+    local button = AceGUI:Create("Button")
+    button:SetText("Delete all")
+    button:SetWidth(100)
+    button:SetCallback("OnClick", function() KillOnSight:ResetHistoryLogs() end)
+    buttonGroup:AddChild(button)
+
+    local heading = AceGUI:Create("Heading")
+    heading:SetRelativeWidth(1)
+    buttonGroup:AddChild(heading)
 end
 
 function DrawKillOnSightListTab(container)
     KillOnSight:InitKillOnSightListTab()
     KillOnSight:RefreshKosList()
+    historyLogsScrollingTableFrame:Hide()
     scrollingTableFrame:Show()
 end
   
 function DrawKillDeathStatsTab(container)
+    KillOnSight:InitHistoryLogsTab()
+    KillOnSight:RefreshHistoryLogs()
     scrollingTableFrame:Hide()
+    historyLogsScrollingTableFrame:Show()
 end
   
 function SelectGroup(container, event, group)
@@ -138,6 +164,29 @@ function KillOnSight:RefreshKosList(filter)
         end
     end
     scrollingTableFrame:SetData(data, false)
+end
+
+function KillOnSight:RefreshHistoryLogs()
+    local data = {
+        cols = {}
+    }
+    for k, v in pairs(self.db.char.history) do
+        local pvpLog = {
+            ["cols"] = {
+                {
+                    ["value"] = v["name"],
+                },
+                {
+                    ["value"] = v["win"],
+                },
+                {
+                    ["value"] = v["lose"],
+                },
+            }
+        }
+        data[#data+1] = pvpLog
+    end
+    historyLogsScrollingTableFrame:SetData(data, false)
 end
 
 function KillOnSight:EnemyFoundMessage(enemyName)
