@@ -3,6 +3,8 @@ KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "Ace
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LDBIcon = LibStub("LibDBIcon-1.0")
 
+local eventFrame = CreateFrame("Frame")
+
 local defaultProfile = {
     profile = {
         settings = {
@@ -10,12 +12,12 @@ local defaultProfile = {
             enableInArena = false,
             enableAlertSound = true,
             enableAlertText = true,
-            [[-- TODO
+
+            enableAlertOnNameplateRegistered = true,
             enableAlertOnMouseOver = true,
             enableAlertOnTarget = true,
-            enableAlertOnNameplateRegistered = true, NEEDED SHOW ENEMY NAMEPLATES
-            enableOnAllies = false, TO DEBUG MOSTLY
-            --]]
+            enableOnAllies = false,
+            alertMinTimer = 10,
         },
         minimapButton = {
             hide = false,
@@ -23,6 +25,7 @@ local defaultProfile = {
     },
     char = {
         kos = {},
+        history = {}
     },
 }
 
@@ -53,29 +56,46 @@ function KillOnSight:OnInitialize()
 			tooltip:AddLine(string.format("|cff888888%s|r |cffffffff%s|r", "Right Click :", "Open addon interface window"))
 		end
     }), self.db.profile.minimapButton)
+    eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+    eventFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+    eventFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+
     --KillOnSight:HideGUI()
 end
 
 function KillOnSight:OnEnable()
-    KillOnSight:RegisterEvent("PLAYER_TARGET_CHANGED")
-    KillOnSight:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
-    KillOnSight:RegisterEvent("NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_ADDED")
+
 end
 
-function KillOnSight:NAME_PLATE_UNIT_ADDED(event, nameplate)
-    name = UnitName(nameplate)
-    KillOnSight:AlertEvent(name)
+local function OnEvent(self, event, ...)
+    if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
+    elseif event == "NAME_PLATE_UNIT_ADDED" then
+        local nameplate = ...
+        local name = UnitName(nameplate)
+        KillOnSight:AlertEvent(name, "nameplate")
+    elseif event == "UPDATE_MOUSEOVER_UNIT" then
+        local name = UnitName("mouseover")
+        KillOnSight:AlertEvent(name, "mouseover")
+    elseif event == "PLAYER_TARGET_CHANGED" then
+        local name = UnitName("target")
+        KillOnSight:AlertEvent(name, "target")
+    end
 end
 
-function KillOnSight:PLAYER_TARGET_CHANGED()
-    KillOnSight:AlertEvent(false)
-end
+eventFrame:SetScript("OnEvent", OnEvent)
 
-function KillOnSight:UPDATE_MOUSEOVER_UNIT()
-    KillOnSight:AlertEvent(false)
-end
-
-function KillOnSight:AlertEvent(name)
+function KillOnSight:AlertEvent(name, type)
+    if type == "nameplate" and self.db.profile.settings.enableAlertOnNameplateRegistered == false then
+        return
+    end
+    if type == "mouseover" and self.db.profile.settings.enableAlertOnMouseOver == false then
+        return
+    end
+    if type == "target" and self.db.profile.settings.enableAlertOnTarget == false then
+        return
+    end
     local currentZone = GetRealZoneText()
 
     if self.db.profile.settings.enableInArena == false then
@@ -95,12 +115,16 @@ function KillOnSight:AlertEvent(name)
     end
 
     for i,v in ipairs(self.db.char.kos) do
-        if UnitName("target") == v.name or UnitName("mouseover") == v.name or name == v.name then
-            if self.db.profile.settings.enableAlertSound then
-                PlaySound(8959)
-            end
-            if self.db.profile.settings.enableAlertText then
-                KillOnSight:EnemyFoundMessage(v.name)
+        if name == v.name then
+            if (time() > (v.lastUpdated + self.db.profile.settings.alertMinTimer)) then
+                print("IN")
+                KillOnSight:UpdateEnemy(v)
+                if self.db.profile.settings.enableAlertSound then
+                    PlaySound(8959)
+                end
+                if self.db.profile.settings.enableAlertText then
+                    KillOnSight:EnemyFoundMessage(v.name)
+                end
             end
         end
     end
@@ -120,23 +144,58 @@ function KillOnSight:AddEnemy()
         if (not UnitIsPlayer("target")) then
             KillOnSight:Print(string.format("|cffff0000%s|r", "This target is not a player !"))
         else
-            if playerFaction ~= targetFaction then
-                -- TODO CALL KOS ADD ENTRY FUNC
+            if self.db.profile.settings.enableOnAllies == false then
+                if playerFaction ~= targetFaction then
+                    KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneName) 
+                else
+                    KillOnSight:Print(string.format("|cffff0000%s|r", "This target is from your faction !"))
+                end
             else
-                KillOnSight:Print(string.format("|cffff0000%s|r", "This target is from your faction !"))
+                KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneName) 
             end
-            KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName) 
         end
     end
 end
 
-function KillOnSight:InsertTable(targetName, targetLevel, targetClass, zoneName)
+function KillOnSight:UpdateEnemy(enemy)
+    local zoneName = GetRealZoneText()
+    enemy.zone = zoneName
+    enemy.lastUpdated = time()
+    KillOnSight:RefreshKosList()
+end
+
+function KillOnSight:DeleteEnemy(enemyName)
+    if enemyName == "" then
+        KillOnSight:Print(string.format("|cffff0000%s|r", "You need to type the enemy name !"))
+        return
+    end
+    
+    local foundIndex = -1
+    for i,v in ipairs(self.db.char.kos) do
+        if enemyName == v.name then
+            foundIndex = i
+            break
+        end
+    end
+
+    if (foundIndex ~= -1) then
+        table.remove(self.db.char.kos, foundIndex) 
+        KillOnSight:Print(string.format("%s has been successfully removed from your KoS list !", enemyName))
+    else
+        KillOnSight:Print(string.format("|cffff0000'%s' %s|r", enemyName, "was not found in your list !"))
+        return
+    end
+    KillOnSight:RefreshKosList()
+end
+
+function KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneName)
     local enemy = {
         ['name'] = targetName,
         ['level'] = targetLevel,
         ['class'] = targetClass,
         ['zone'] = zoneName,
-        ['date'] = date("%m/%d/%y %H:%M"),
+        ['date'] = time(),
+        ['lastUpdated'] = time(),
     }
     local alreadyExists = false
     for i,v in ipairs(self.db.char.kos) do
