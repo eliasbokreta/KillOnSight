@@ -68,7 +68,18 @@ end
 
 local function OnEvent(self, event, ...)
     if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
+        local timestamp, subevent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags  = CombatLogGetCurrentEventInfo()
+        if subevent == "SWING_DAMAGE" then
+            amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+            if overkill >= 0 then
+                KillOnSight:UpdateHistoryLogs(sourceName, destName)
+            end
+        elseif subevent == "SPELL_DAMAGE" or subevent == "SPELL_PERIODIC_DAMAGE" or subevent == "RANGE_DAMAGE" then
+            spellId, spellName, spellSchool, amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+            if overkill >= 0 then
+                KillOnSight:UpdateHistoryLogs(sourceName, destName)
+            end
+        end
     elseif event == "NAME_PLATE_UNIT_ADDED" then
         local nameplate = ...
         local name = UnitName(nameplate)
@@ -82,7 +93,7 @@ local function OnEvent(self, event, ...)
     end
 end
 
-eventFrame:SetScript("OnEvent", OnEvent)
+eventFrame:SetScript("OnEvent", function(self,event,...) OnEvent(self, event, ...) end)
 
 function KillOnSight:AlertEvent(name, type)
     if type == "nameplate" and self.db.profile.settings.enableAlertOnNameplateRegistered == false then
@@ -215,7 +226,48 @@ function KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneNam
     end
 end
 
-function KillOnSight:PurgeData()
+function KillOnSight:UpdateHistoryLogs(sourceName, destName)
+    local playerName, enemyName, win, lose
+
+    if sourceName == UnitName("player") then
+        playerName = sourceName
+        enemyName = destName
+        win = 1
+        lose = 0
+    elseif destName == UnitName("player") then
+        playerName = destName
+        enemyName = sourceName
+        win = 0
+        lose = 1
+    else
+        return
+    end
+    
+    local alreadyExists = false
+    for i,v in ipairs(self.db.char.history) do
+        if enemyName == v.name then
+            alreadyExists = true
+            v.win = v.win + win
+            v.lose = v.lose + lose
+        end
+    end
+    local logs = {
+        ['name'] = enemyName,
+        ['win'] = win,
+        ['lose'] = lose,
+    }
+    if alreadyExists == false then
+        table.insert(self.db.char.history, logs)
+    end
+    KillOnSight:RefreshHistoryLogs()
+end
+
+function KillOnSight:ResetKosList()
     self.db.char.kos = {}
     KillOnSight:RefreshKosList()
+end
+
+function KillOnSight:ResetHistoryLogs()
+    self.db.char.history = {}
+    KillOnSight:RefreshHistoryLogs()
 end
