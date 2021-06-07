@@ -67,7 +67,14 @@ function KillOnSight:RegisterOptionsTable()
                                 desc = 'Enable KOS in battlegrounds',
                                 get = function() return self.db.profile.settings.enableInBG end,
                                 set = function(_, val) self.db.profile.settings.enableInBG = val end,
-                            }
+                            },
+                            enableInArena = {
+                                type = 'toggle',
+                                name = 'Enable in arenas',
+                                desc = 'Enable KOS in arenas',
+                                get = function() return self.db.profile.settings.enableInArena end,
+                                set = function(_, val) self.db.profile.settings.enableInArena = val end,
+                            },
                         }
                     },
                     Alerts = {
@@ -87,13 +94,6 @@ function KillOnSight:RegisterOptionsTable()
                                 step = 10,
                                 get = function() return self.db.profile.settings.alertMinTimer end,
                                 set = function(_, val) self.db.profile.settings.alertMinTimer = val end,
-                            },
-                            enableInArena = {
-                                type = 'toggle',
-                                name = 'Enable in arenas',
-                                desc = 'Enable KOS in arenas',
-                                get = function() return self.db.profile.settings.enableInArena end,
-                                set = function(_, val) self.db.profile.settings.enableInArena = val end,
                             },
                             enableAlertSound = {
                                 type = 'toggle',
