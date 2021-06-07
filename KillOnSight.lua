@@ -151,6 +151,8 @@ function KillOnSight:AddEnemy()
                 KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneName) 
             end
         end
+    else
+        KillOnSight:Print(string.format("|cffff0000%s|r", "You must target an enemy !"))
     end
 end
 
@@ -162,8 +164,12 @@ function KillOnSight:UpdateEnemy(enemy)
 end
 
 function KillOnSight:DeleteEnemy(enemyName)
+    if enemyName == nil then
+        KillOnSight:Print(string.format("|cffff0000%s|r", "You must target an enemy !"))
+        return
+    end
     if enemyName == "" then
-        KillOnSight:Print(string.format("|cffff0000%s|r", "You need to type the enemy name !"))
+        KillOnSight:Print(string.format("|cffff0000%s|r", "You must type the enemy name !"))
         return
     end
     
