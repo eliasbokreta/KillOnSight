@@ -22,6 +22,7 @@ You can access the command line with the following chat slash commands
 
 ### Options :
 - `/kos add` : Add current target to KoS
+- `/kos delete <playerName>` : Remove a player from the list
 - `/kos menu` : Display/hide KoS main menu
 - `/kos settings` : Open interface addon settings
 
