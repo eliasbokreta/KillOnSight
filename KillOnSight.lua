@@ -1,5 +1,5 @@
 local addonName = "KillOnSight"
-KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
+KillOnSight = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
 local LDBIcon = LibStub("LibDBIcon-1.0")
 
