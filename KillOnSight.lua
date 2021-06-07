@@ -60,8 +60,6 @@ function KillOnSight:OnInitialize()
     eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
     eventFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
     eventFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-
-    --KillOnSight:HideGUI()
 end
 
 function KillOnSight:OnEnable()
@@ -117,7 +115,6 @@ function KillOnSight:AlertEvent(name, type)
     for i,v in ipairs(self.db.char.kos) do
         if name == v.name then
             if (time() > (v.lastUpdated + self.db.profile.settings.alertMinTimer)) then
-                print("IN")
                 KillOnSight:UpdateEnemy(v)
                 if self.db.profile.settings.enableAlertSound then
                     PlaySound(8959)
@@ -206,7 +203,7 @@ function KillOnSight:AddEnemyToKos(targetName, targetLevel, targetClass, zoneNam
     if alreadyExists == false then
         table.insert(self.db.char.kos, enemy)
         KillOnSight:RefreshKosList()
-        KillOnSight:Print(string.format("%s has been successfully added to your KoS list !", targetName))
+        KillOnSight:Print(string.format("'%s' has been successfully added to your KoS list !", targetName))
     else
         KillOnSight:Print(string.format("|cffff0000%s|r", "This target is already on your KoS list !"))
     end
