@@ -1,6 +1,6 @@
 # KillOnSight [UNDER DEVELOPMENT]
 
-## What is it ?
+## Description
 This is a World Of Warcraft addon which allows to create a Kill On Sight list of enemy players and alert you whenever you target or mouseover them, it also scan for currently visible nameplates on your UI and trigger an alert.
 The addon also tracks kills and deaths done to/from a unit.
 
@@ -29,6 +29,33 @@ You can access the command line with the following chat slash commands
 
 ## Screenshots
 ![](.github/kosaddon.png)
+
+## Features
+### Kill On Sight
+*Handles Kill on Sight core features for alerting and tracking*
+- **Add a player to your kill on sight list** :
+    - *a target* - **From the chat command or the main window (under 'KoS List' tab)**
+- **Remove a player from your kill on sight list** :
+    - *a target* - **From the main window (under 'KoS List' tab)**
+    - *a player by his name* - **From the chat command**
+    - *a player selected in the list* - **From the main window (under 'KoS List' tab)**
+- **Filter players for display** :
+    - *by name* - **From the main window (under 'KoS List' tab)**
+- **Handling KoS list** :
+    - *import (override or append) a list* - **From the addon settings**
+    - *export a list* - **From the addon settings**
+    - *reset the list* - **From the main window (under 'KoS List' tab) or the addon settings**
+- **Customize alerts** :
+    - *enable/disable text alerts* - **From the addon settings**
+    - *enable/disable sound alerts* - **From the addon settings**
+    - *enable/disable alerts in BGs* - **From the addon settings**
+    - *enable/disable alerts in arena* - **From the addon settings**
+    - *customize alerts occurence (in seconds)* - **From the addon settings**
+    - *choose alerts from specific events (on target, mouseover or namplate visible)* - **From the addon settings**
+### Kills history
+*Automatically tracks kill and deaths, and get stats for specific players*
+- *Add kills/death to the list* - **Automatically done when a kill/death event is registered**
+- *Reset the list* - **From the main window (under 'K/D History' tab)**
 
 
 ## To do
