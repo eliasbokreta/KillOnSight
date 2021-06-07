@@ -111,3 +111,61 @@ KillOnSightListStructure = {
         }
     },
 }
+
+
+HistoryLogsStructure = {
+    {
+        ["name"] = "Name",
+        ["width"] = 200,
+        ["align"] = "CENTER",
+        ["comparesort"] = function (self, rowa, rowb, sortbycol) return KillOnSight:Sort(self, rowa, rowb, sortbycol, 1) end,
+        ["color"] = { 
+            ["r"] = 255.0, 
+            ["g"] = 255.0, 
+            ["b"] = 255.0, 
+            ["a"] = 1.0 
+        },
+        ["bgcolor"] = {
+            ["r"] = 0.0, 
+            ["g"] = 0.0, 
+            ["b"] = 255.0, 
+            ["a"] = 0.1
+        }
+    },
+    {
+        ["name"] = "Win",
+        ["width"] = 200,
+        ["align"] = "CENTER",
+        ["comparesort"] = function (self, rowa, rowb, sortbycol) return KillOnSight:Sort(self, rowa, rowb, sortbycol, 2) end,
+        ["color"] = { 
+            ["r"] = 255.0, 
+            ["g"] = 255.0, 
+            ["b"] = 255.0, 
+            ["a"] = 1.0 
+        },
+        ["bgcolor"] = {
+            ["r"] = 0.0, 
+            ["g"] = 0.0, 
+            ["b"] = 255.0, 
+            ["a"] = 0.0
+        }
+    },
+    {
+        ["name"] = "Lose",
+        ["width"] = 200,
+        ["align"] = "CENTER",
+        ["comparesort"] = function (self, rowa, rowb, sortbycol) return KillOnSight:Sort(self, rowa, rowb, sortbycol, 3) end,
+        ["color"] = { 
+            ["r"] = 255.0, 
+            ["g"] = 255.0, 
+            ["b"] = 255.0, 
+            ["a"] = 1.0 
+        },
+        ["bgcolor"] = {
+            ["r"] = 0.0, 
+            ["g"] = 0.0, 
+            ["b"] = 255.0, 
+            ["a"] = 0.1
+        }
+    },
+}
