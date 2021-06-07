@@ -7,7 +7,7 @@ local LibST = LibStub("ScrollingTable")
 local winWidth = 750
 local winHeight = 450
 
-local frame, tabGroup, alertFrame, scrollingTableFrame, historyLogsScrollingTableFrame
+local frame, tabGroup, alertFrame, deleteSelectedKosButton, scrollingTableFrame, historyLogsScrollingTableFrame
 
 function KillOnSight:InitGUI()
     frame = AceGUI:Create("Frame")
@@ -28,6 +28,16 @@ function KillOnSight:InitGUI()
     scrollingTableFrame.frame:ClearAllPoints()
     scrollingTableFrame.frame:SetPoint("TOP", frame.frame, "TOP", 0, -170)
     scrollingTableFrame.head:SetHeight(30)
+    scrollingTableFrame:EnableSelection(true)
+    scrollingTableFrame:RegisterEvents({["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, table, button)
+                                            if realrow ~= table.selected or not table.fSelect then
+                                                self.db.char.selectedKos = data[row]['cols'][1].value
+                                                deleteSelectedKosButton:SetDisabled(false)
+                                            else
+                                                self.db.char.selectedKos = nil
+                                                deleteSelectedKosButton:SetDisabled(true)
+                                            end
+                                        end})
 
     historyLogsScrollingTableFrame = LibST:CreateST(HistoryLogsStructure, 14, nil, nil, tabGroup.frame)
     historyLogsScrollingTableFrame.frame:ClearAllPoints()
@@ -36,6 +46,7 @@ function KillOnSight:InitGUI()
 
     tabGroup:SelectTab("1")
     KillOnSight:InitAlertFrame()
+    frame:Hide()
 end
 
 function KillOnSight:InitKillOnSightListTab()
@@ -51,15 +62,22 @@ function KillOnSight:InitKillOnSightListTab()
     buttonGroup:AddChild(button)
 
     local button = AceGUI:Create("Button")
-    button:SetText("Delete Target")
+    button:SetText("Delete target")
     button:SetWidth(120)
     button:SetCallback("OnClick", function() KillOnSight:DeleteEnemy(UnitName("target")) end)
     buttonGroup:AddChild(button)
 
+    deleteSelectedKosButton = AceGUI:Create("Button")
+    deleteSelectedKosButton:SetText("Delete selected")
+    deleteSelectedKosButton:SetWidth(130)
+    deleteSelectedKosButton:SetCallback("OnClick", function() KillOnSight:DeleteEnemy(self.db.char.selectedKos) end)
+    deleteSelectedKosButton:SetDisabled(true)
+    buttonGroup:AddChild(deleteSelectedKosButton)
+
     local button = AceGUI:Create("Button")
     button:SetText("Delete All")
     button:SetWidth(100)
-    button:SetCallback("OnClick", function() KillOnSight:PurgeData() end)
+    button:SetCallback("OnClick", function() KillOnSight:ResetKosList() end)
     buttonGroup:AddChild(button)
 
     local filterName = AceGUI:Create("EditBox")
