@@ -84,9 +84,7 @@ end
 
 function KillOnSight:RefreshKosList()
     local data = {
-        {
-            ["cols"] = {}
-        }
+        cols = {}
     }
     for k, v in pairs(self.db.char.kos) do
         local player = {
@@ -104,13 +102,18 @@ function KillOnSight:RefreshKosList()
                     ["value"] = v["zone"],
                 },
                 {
-                    ["value"] = v["date"],
+                    ["value"] = date("%m/%d/%y %H:%M:%S", v["date"]),
                 },
+                {
+                    ["value"] = date("%m/%d/%y %H:%M:%S", v["lastUpdated"]),
+                },
+                --[[
+                    ["value"] = v["guild"] == nil and "Unknown" or v["guild"],
+                },]]--
             }
         }
         data[#data+1] = player
     end
-    table.remove(data, 1)
     scrollingTableFrame:SetData(data, false)
 end
 
