@@ -135,7 +135,7 @@ function KillOnSight:PrettyPrint(o)
        end
        return s .. '} '
     else
-       return tostring(o)
+       print(tostring(o))
     end
  end
 
