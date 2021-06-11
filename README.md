@@ -67,7 +67,7 @@ You can access the command line with the following chat slash commands
     - <s>Kill/dead history tab, with possibility to add a previous enemy to the KoS list</s>
 - <s>Implement a timer for already shown alerts, avoiding alert spaming when changing target/mouseover</s>
 - Implement a feature to add player from kill/dead stats tab to the KoS
-- Fix > 10 lvls info from the KoS tab
+- <s>Fix > 10 lvls info from the KoS tab<s>
 - Add notes to a KoS player
 - Implement a silent mode with only chat console messages
 - Add guild and realm from KoS and kill/death history tabs
