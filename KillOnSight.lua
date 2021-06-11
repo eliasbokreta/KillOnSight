@@ -147,6 +147,9 @@ function KillOnSight:AddEnemy()
         local targetGUID = UnitGUID("target")
         local targetFaction = UnitFactionGroup("target")
         local targetLevel = UnitLevel("target")
+        if targetLevel == -1 then
+            targetLevel = UnitLevel("player") + 10 .. "+"
+        end
         local targetClass = UnitClass("target")
 
         if (not UnitIsPlayer("target")) then
@@ -176,7 +179,7 @@ end
 
 function KillOnSight:DeleteEnemy(enemyName)
     if enemyName == nil then
-        KillOnSight:Print(string.format("|cffff0000%s|r", "You must target an enemy !"))
+        KillOnSight:Print(string.format("|cffff0000%s|r", "You must target or select an enemy !"))
         return
     end
     if enemyName == "" then
